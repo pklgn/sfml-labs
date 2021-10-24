@@ -1,7 +1,6 @@
 add_executable(02 main.cpp)
 
 set(SFML_STATIC_LIBRARIES TRUE)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "C:/Soft/CppDistro/cmake/share/cmake-3.9/Modules/")
 find_package(Freetype)
 find_package(JPEG)
 find_package(SFML 2 COMPONENTS window graphics system)

@@ -1,56 +1,58 @@
-#include <cmath>
 #include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include <cmath>
 
-constexpr unsigned WINDOW_WIDTH = 800;
-constexpr unsigned WINDOW_HEIGHT = 600;
+int main()
+{
+    constexpr int pointCount = 200;
+    const sf::Vector2f speed = { 20.f, 20.f };
+    int moveNo = 1;
+    float moveAngle;
+    sf::Clock clock;
 
-int main() {
-    constexpr float BALL_SIZE = 40;
-    sf::RenderWindow window(sf::VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT}), "Wave Moving Ball");
-    sf::Clock clockX;
-    sf::Clock clockY;
-    float time;
-    float edgeTime;
-    int backwardX = 0;
-    float deltaX;
-    sf::Vector2f currPosition;
-    const sf::Vector2f position = {10, 350};
 
-    sf::CircleShape ball(BALL_SIZE);
-    ball.setFillColor(sf::Color(0xFF, 0xFF, 0x00));
-    constexpr float speedX = 100.f;
-    constexpr float amplitudeY = 80.f;
-    constexpr float periodY = 2;
-    while (window.isOpen()) {
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 8;
+    sf::RenderWindow window(
+            sf::VideoMode({ 800, 600 }), "Ellipse",
+            sf::Style::Default, settings);
+
+    sf::ConvexShape rose;
+    rose.setPosition({400, 320 });
+    rose.setFillColor(sf::Color(0xFF, 0x09, 0x80));
+
+    rose.setPointCount(pointCount);
+    for (int pointNo = 0; pointNo < pointCount; ++pointNo)
+    {
+        float angle = float(2 * M_PI * pointNo) / float(pointCount);
+        float radius = 200 * std::sin(6 * angle);
+        sf::Vector2f point = {
+            radius * std::sin(angle),
+            radius * std::cos(angle)
+        };
+        rose.setPoint(pointNo, point);
+    }
+
+    while (window.isOpen())
+    {
         sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+            {
                 window.close();
             }
         }
-        const float wavePhase = clockY.getElapsedTime().asSeconds() * float(2 * M_PI);
-        const float y = amplitudeY * std::sin(wavePhase / periodY);
-        if (backwardX) {
-            deltaX = clockX.getElapsedTime().asSeconds() - edgeTime;
-            time = edgeTime - deltaX;
-        } else {
-            time = clockX.getElapsedTime().asSeconds();
-        }
-        const float x = (speedX * time);
-        currPosition = ball.getPosition();
-        if (currPosition.x + 2 * BALL_SIZE >= WINDOW_WIDTH) {
-            edgeTime = time;
-            backwardX = 1;
-        }
-        if (currPosition.x <= 0) {
-            clockX.restart();
-            backwardX = 0;
-        }
-        const sf::Vector2f offset = {x, y};
-        ball.setPosition(position + offset);
+        moveNo++;
+        const float deltaTime = clock.restart().asSeconds();
+        sf::Vector2f position = rose.getPosition();
+        moveAngle = float(2 * M_PI * moveNo) / float(pointCount);
+        position.x += speed.x * deltaTime * std::cos(moveAngle);
+        position.y += speed.y * deltaTime * std::sin(moveAngle);
+        rose.setPosition(position);
 
         window.clear();
-        window.draw(ball);
+        window.draw(rose);
         window.display();
     }
 }

@@ -1,7 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include <iostream>
-#include <algorithm>
 
 const sf::Vector2f startPoint = {400, 300};
 
